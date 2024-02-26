@@ -6,7 +6,7 @@ export function Video() {
         width="100%"
         height="100%"
         controls={true}
-        url={'https://youtu.be/YUv2xzvxLT8?list=RDYUv2xzvxLT8'}
+        url={'https://www.youtube.com/watch?v=YUv2xzvxLT8'}
       />
     </div>
   )
