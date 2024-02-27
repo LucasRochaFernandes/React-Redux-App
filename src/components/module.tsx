@@ -1,8 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 import { Lesson } from './lesson'
 import * as Collapsible from '@radix-ui/react-collapsible'
-import { useAppSelector } from '../store'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch, useAppSelector } from '../store'
 import { play } from '../store/slices/player'
 
 interface ModuleProps {
@@ -12,12 +11,12 @@ interface ModuleProps {
 }
 
 export function Module({ title, amountOfLessons, moduleIndex }: ModuleProps) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { currentModuleIndex, currentLessonIndex } = useAppSelector((state) => {
     return state.player
   })
   const lessons = useAppSelector(
-    (state) => state.player.course.modules[moduleIndex].lessons,
+    (state) => state.player.course?.modules[moduleIndex].lessons,
   )
   return (
     <Collapsible.Root className="group" defaultOpen={moduleIndex === 0}>
@@ -33,19 +32,21 @@ export function Module({ title, amountOfLessons, moduleIndex }: ModuleProps) {
       </Collapsible.Trigger>
       <Collapsible.Content>
         <nav className="relative flex flex-col gap-4 p-6">
-          {lessons.map((lesson, index) => {
-            const isCurrent =
-              currentModuleIndex === moduleIndex && currentLessonIndex === index
-            return (
-              <Lesson
-                key={lesson.id}
-                title={lesson.title}
-                duration={lesson.duration}
-                onPlay={() => dispatch(play([moduleIndex, index]))}
-                isCurrent={isCurrent}
-              />
-            )
-          })}
+          {lessons &&
+            lessons.map((lesson, index) => {
+              const isCurrent =
+                currentModuleIndex === moduleIndex &&
+                currentLessonIndex === index
+              return (
+                <Lesson
+                  key={lesson.id}
+                  title={lesson.title}
+                  duration={lesson.duration}
+                  onPlay={() => dispatch(play([moduleIndex, index]))}
+                  isCurrent={isCurrent}
+                />
+              )
+            })}
         </nav>
       </Collapsible.Content>
     </Collapsible.Root>

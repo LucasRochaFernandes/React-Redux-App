@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { play, playerSlice, player, next } from './player'
+import { play, playerSlice, player, next, PlayerState } from './player'
 
-const exampleState = {
+const exampleState: PlayerState = {
   course: {
+    id: 1,
     modules: [
       {
-        id: '1',
+        id: 1,
         title: 'Top Songs 1',
         lessons: [
           {
@@ -21,7 +22,7 @@ const exampleState = {
         ],
       },
       {
-        id: '2',
+        id: 2,
         title: 'Top Songs 2',
         lessons: [
           {
@@ -38,6 +39,7 @@ const exampleState = {
       },
     ],
   },
+  isLoading: false,
   currentModuleIndex: 0,
   currentLessonIndex: 0,
 }

@@ -1,48 +1,41 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { useAppSelector } from '..'
+import { api } from '../../lib/axios'
+
+interface Course {
+  id: number
+  modules: {
+    id: number
+    title: string
+    lessons: {
+      id: string
+      title: string
+      duration: string
+    }[]
+  }[]
+}
+
+export interface PlayerState {
+  currentModuleIndex: number
+  currentLessonIndex: number
+  isLoading: boolean
+  course: Course | null
+}
+
+const initialState: PlayerState = {
+  course: null,
+  currentModuleIndex: 0,
+  currentLessonIndex: 0,
+  isLoading: true,
+}
+export const loadCourse = createAsyncThunk('player/load', async () => {
+  const response = await api.get('/playlists/1')
+  return await response.data
+})
 
 export const playerSlice = createSlice({
   name: 'player',
-  initialState: {
-    course: {
-      modules: [
-        {
-          id: '1',
-          title: 'Top Songs 1',
-          lessons: [
-            {
-              id: 'YUv2xzvxLT8',
-              title: "Travelin' Man",
-              duration: '08:00',
-            },
-            {
-              id: 'y5oPZFDci80',
-              title: 'Moving in Stereo',
-              duration: '08:00',
-            },
-          ],
-        },
-        {
-          id: '2',
-          title: 'Top Songs 2',
-          lessons: [
-            {
-              id: '_MpDmeCrxcw',
-              title: 'Setting The Woods On Fire',
-              duration: '08:00',
-            },
-            {
-              id: 'KbHaIbDKQMc',
-              title: 'Hey Lover',
-              duration: '08:00',
-            },
-          ],
-        },
-      ],
-    },
-    currentModuleIndex: 0,
-    currentLessonIndex: 0,
-  },
+  initialState,
   reducers: {
     play: (state, action: PayloadAction<[number, number]>) => {
       state.currentModuleIndex = action.payload[0]
@@ -51,12 +44,14 @@ export const playerSlice = createSlice({
     next: (state) => {
       const nextLessonIndex = state.currentLessonIndex + 1
       const nextLesson =
-        state.course.modules[state.currentModuleIndex].lessons[nextLessonIndex]
+        state.course?.modules[state.currentModuleIndex]?.lessons[
+          nextLessonIndex
+        ]
       if (nextLesson) {
         state.currentLessonIndex = nextLessonIndex
       } else {
         const nextModuleIndex = state.currentModuleIndex + 1
-        const nextModule = state.course.modules[nextModuleIndex]
+        const nextModule = state.course?.modules[nextModuleIndex]
         if (nextModule) {
           state.currentModuleIndex = nextModuleIndex
           state.currentLessonIndex = 0
@@ -64,16 +59,24 @@ export const playerSlice = createSlice({
       }
     },
   },
+  extraReducers(builder) {
+    builder.addCase(loadCourse.fulfilled, (state, action) => {
+      state.course = action.payload
+      state.isLoading = false
+    })
+    builder.addCase(loadCourse.pending, (state, action) => {
+      state.isLoading = true
+    })
+  },
 })
-
 export const player = playerSlice.reducer
 export const { play, next } = playerSlice.actions
 
 export const useCurrentLesson = () => {
   return useAppSelector((state) => {
     const { currentLessonIndex, currentModuleIndex } = state.player
-    const currentModule = state.player.course.modules[currentModuleIndex]
-    const currentLesson = currentModule.lessons[currentLessonIndex]
+    const currentModule = state.player.course?.modules[currentModuleIndex]
+    const currentLesson = currentModule?.lessons[currentLessonIndex]
     return { currentLesson, currentModule }
   })
 }

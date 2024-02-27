@@ -3,16 +3,24 @@ import { MessageCircle } from 'lucide-react'
 import { Header } from '../components/header'
 import { Module } from '../components/module'
 import { Video } from '../components/video'
-import { useAppSelector } from '../store'
-import { useCurrentLesson } from '../store/slices/player'
+import { useAppDispatch, useAppSelector } from '../store'
+import { loadCourse, useCurrentLesson } from '../store/slices/player'
 import { useEffect } from 'react'
 
 export function Player() {
-  const modules = useAppSelector((state) => state.player.course.modules)
+  const modules = useAppSelector((state) => state.player.course?.modules)
 
   const { currentLesson } = useCurrentLesson()
+
+  const dispatch = useAppDispatch()
   useEffect(() => {
-    document.title = `Assistindo: ${currentLesson.title}`
+    dispatch(loadCourse())
+  }, [])
+
+  useEffect(() => {
+    if (currentLesson) {
+      document.title = `Assistindo: ${currentLesson.title}`
+    }
   }, [currentLesson])
 
   return (
@@ -30,16 +38,17 @@ export function Player() {
             <Video />
           </div>
           <aside className="w-80 divide-y-2 divide-zinc-900 absolute right-0 top-0 bottom-0 border-l border-zinc-800 bg-zinc-900 overflow-y-scroll scrollbar-thin scrollbar-track-zinc-950 scrollbar-thumb-zinc-800">
-            {modules.map((module, index) => {
-              return (
-                <Module
-                  key={module.id}
-                  amountOfLessons={module.lessons.length}
-                  title={module.title}
-                  moduleIndex={index}
-                />
-              )
-            })}
+            {modules &&
+              modules.map((module, index) => {
+                return (
+                  <Module
+                    key={module.id}
+                    amountOfLessons={module.lessons.length}
+                    title={module.title}
+                    moduleIndex={index}
+                  />
+                )
+              })}
           </aside>
         </main>
       </div>
