@@ -1,6 +1,8 @@
-import { useCurrentLesson } from '../store/slices/player'
+import { useCurrentLesson } from '../zustand-store'
 
+// Redux
 export function Header() {
+  // const { currentLesson, currentModule } = useCurrentLesson()
   const { currentLesson, currentModule } = useCurrentLesson()
   return (
     <div className="flex flex-col gap-1">

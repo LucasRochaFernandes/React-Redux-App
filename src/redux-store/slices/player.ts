@@ -64,7 +64,7 @@ export const playerSlice = createSlice({
       state.course = action.payload
       state.isLoading = false
     })
-    builder.addCase(loadCourse.pending, (state, action) => {
+    builder.addCase(loadCourse.pending, (state) => {
       state.isLoading = true
     })
   },

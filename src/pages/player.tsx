@@ -1,22 +1,34 @@
 import { MessageCircle } from 'lucide-react'
-
 import { Header } from '../components/header'
 import { Module } from '../components/module'
 import { Video } from '../components/video'
-import { useAppDispatch, useAppSelector } from '../store'
-import { loadCourse, useCurrentLesson } from '../store/slices/player'
+import { useCurrentLesson, useStore } from '../zustand-store'
 import { useEffect } from 'react'
 
+// Redux
 export function Player() {
-  const modules = useAppSelector((state) => state.player.course?.modules)
+  const { course, load } = useStore()
+  const modules = course?.modules
+  // const modules = useAppSelector((state) => state.player.course?.modules)
 
-  const { currentLesson } = useCurrentLesson()
+  // const { currentLesson } = useCurrentLesson()
 
-  const dispatch = useAppDispatch()
+  // const dispatch = useAppDispatch()
+  // useEffect(() => {
+  //   dispatch(loadCourse())
+  // }, [])
+
   useEffect(() => {
-    dispatch(loadCourse())
+    load()
   }, [])
 
+  // useEffect(() => {
+  //   if (currentLesson) {
+  //     document.title = `Assistindo: ${currentLesson.title}`
+  //   }
+  // }, [currentLesson])
+
+  const { currentLesson } = useCurrentLesson()
   useEffect(() => {
     if (currentLesson) {
       document.title = `Assistindo: ${currentLesson.title}`
